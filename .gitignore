@@ -1,0 +1,65 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate.d/
+*.tfvars.secret
+crash.log
+
+# Lambda packaging artifacts
+lambda-deployment.zip
+lambda-package/
+infra/lambda.zip
+
+# Memory storage (contains conversation history)
+memory/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+out/
+.next/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# AWS
+.aws/
+
+# Lab documents and extracted images (not part of the deployable project)
+extracted_images_p01/
+extracted_images_p02/
+week2/
+*.docx
+day2.md
+day3.md
+day3-*.md
+day4.md
+day5.md
+Activity3_*.md
+Activity3_*.pdf
+Activity4_*.md
+Activity4_*.pdf
+ML_OPs_*.md
+convert_to_pdf.py
+Terraform1.png
+Terraform2.png
+
+# Claude Code session files
+.claude/
