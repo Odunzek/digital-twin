@@ -35,8 +35,14 @@ cd infra
 
 AWS_REGION=${DEFAULT_AWS_REGION:-us-east-1}
 
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
 echo "Initializing Terraform..."
-terraform init -input=false
+terraform init -input=false \
+  -backend-config="bucket=twin-terraform-state-${AWS_ACCOUNT_ID}" \
+  -backend-config="key=terraform.tfstate" \
+  -backend-config="region=${AWS_REGION}" \
+  -backend-config="encrypt=true"
 
 # Create workspace if it doesn't exist, otherwise select it
 if ! terraform workspace list | grep -q "^[* ]*${ENVIRONMENT}$"; then

@@ -135,6 +135,8 @@ resource "aws_lambda_function" "twin_api" {
       # It lives in Secrets Manager and is fetched at runtime by secrets.py.
       # This way, if the CloudFront URL changes, you update the secret once
       # instead of modifying the Lambda environment and redeploying.
+
+      CLERK_JWKS_URL   = "https://ultimate-rabbit-96.clerk.accounts.dev/.well-known/jwks.json"
     }
   }
 
