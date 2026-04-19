@@ -69,7 +69,10 @@ cd "${PROJECT_ROOT}"
 # ── 3. Build and deploy frontend ─────────────────────────────────────────────
 echo "Building frontend..."
 
-echo "NEXT_PUBLIC_API_URL=${API_URL}" > .env.production
+cat > .env.production <<EOF
+NEXT_PUBLIC_API_URL=${API_URL}
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+EOF
 
 npm install
 NEXT_EXPORT=true npm run build

@@ -53,9 +53,11 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Run Deployment Script
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          DEFAULT_AWS_REGION: ${{ secrets.DEFAULT_AWS_REGION }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
         run: |
-          export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
-          export DEFAULT_AWS_REGION=${{ secrets.DEFAULT_AWS_REGION }}
           chmod +x scripts/deploy.sh
           ./scripts/deploy.sh ${{ github.event.inputs.environment || 'dev' }}
 
