@@ -2,60 +2,41 @@
 set -e
 
 ENVIRONMENT=${1:-dev}
-PROJECT_NAME=${2:-twin}
+PROJECT_NAME=${2:-essay-coach}
 
 echo "Deploying ${PROJECT_NAME} to ${ENVIRONMENT}..."
 
-# Navigate to project root (works whether called from any directory)
+# Navigate to project root
 cd "$(dirname "$0")/.."
+PROJECT_ROOT=$(pwd)
 
 # ── 1. Build Lambda package ───────────────────────────────────────────────────
 echo "Building Lambda package..."
-cd backend
 
-# Clean any previous package directory
 rm -rf package
 
-# Install Python dependencies as flat files (Lambda requires flat layout, not venv).
-# --platform manylinux2014_x86_64 fetches Linux wheels even when run on macOS.
-# --only-binary=:all:              refuse any package that would compile from source.
-# --python-version 3.12            match the Lambda runtime.
 pip install -r requirements.txt -t ./package \
   --platform manylinux2014_x86_64 \
   --only-binary=:all: \
   --python-version 3.12 \
   --quiet
 
-# Copy Python source files into the package directory
-cp *.py package/
+cp server.py lambda_handler.py app_secrets.py dynamo_memory.py package/
 
-# Copy persona data files if they exist
-if [ -d data ]; then
-  cp -r data package/data
-fi
-
-# Zip everything into infra/lambda.zip (Terraform reads it from there)
 cd package
-zip -r ../../infra/lambda.zip . --quiet
-cd ..
+zip -r "${PROJECT_ROOT}/infra/lambda.zip" . --quiet
+cd "${PROJECT_ROOT}"
 rm -rf package
-cd ..
 
 echo "Lambda package ready: infra/lambda.zip"
 
 # ── 2. Terraform init, workspace, apply ──────────────────────────────────────
 cd infra
 
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 AWS_REGION=${DEFAULT_AWS_REGION:-us-east-1}
 
-echo "Initializing Terraform with S3 backend..."
-terraform init -input=false \
-  -backend-config="bucket=twin-terraform-state-${AWS_ACCOUNT_ID}" \
-  -backend-config="key=${ENVIRONMENT}/terraform.tfstate" \
-  -backend-config="region=${AWS_REGION}" \
-  -backend-config="dynamodb_table=twin-terraform-locks" \
-  -backend-config="encrypt=true"
+echo "Initializing Terraform..."
+terraform init -input=false
 
 # Create workspace if it doesn't exist, otherwise select it
 if ! terraform workspace list | grep -q "^[* ]*${ENVIRONMENT}$"; then
@@ -77,24 +58,28 @@ API_URL=$(terraform output -raw api_gateway_url)
 CLOUDFRONT_DOMAIN=$(terraform output -raw cloudfront_domain)
 FRONTEND_BUCKET=$(terraform output -raw frontend_bucket_name)
 
-cd ..
+cd "${PROJECT_ROOT}"
 
 # ── 3. Build and deploy frontend ─────────────────────────────────────────────
 echo "Building frontend..."
-cd frontend
 
-# Write the API URL so Next.js bakes it into the static build
 echo "NEXT_PUBLIC_API_URL=${API_URL}" > .env.production
 
 npm install
-npm run build
+NEXT_EXPORT=true npm run build
 
 echo "Uploading frontend to S3..."
 aws s3 sync ./out "s3://${FRONTEND_BUCKET}/" --delete
 
-cd ..
+# ── 4. Update Secrets Manager with real CloudFront URL ────────────────────────
+SECRET_NAME="${PROJECT_NAME}/config-${ENVIRONMENT}"
+echo "Updating Secrets Manager: ${SECRET_NAME}..."
+aws secretsmanager update-secret \
+  --secret-id "${SECRET_NAME}" \
+  --secret-string "{\"CORS_ORIGINS\": \"https://${CLOUDFRONT_DOMAIN}\"}" \
+  --region "${AWS_REGION}" > /dev/null 2>&1 || echo "Secrets Manager update skipped (secret may not exist yet)"
 
-# ── 4. Summary ────────────────────────────────────────────────────────────────
+# ── 5. Summary ────────────────────────────────────────────────────────────────
 echo ""
 echo "Deployment complete!"
 echo "CloudFront URL : https://${CLOUDFRONT_DOMAIN}"

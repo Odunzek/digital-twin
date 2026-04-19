@@ -1,4 +1,4 @@
-name: Deploy Digital Twin
+name: Deploy Essay Feedback Coach
 
 on:
   push:

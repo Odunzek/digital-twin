@@ -6,7 +6,7 @@
 # If you ever add sensitive values here (e.g., API keys), add the file to .gitignore immediately.
 
 aws_region       = "us-east-1"        # Change this if your AWS CLI is configured for a different region
-project_name     = "twin"
+project_name     = "essay-coach"
 environment      = "dev"              # Used for resource tags only; resource names use the workspace name
 bedrock_model_id = "global.amazon.nova-2-lite-v1:0"
 lambda_timeout   = 30

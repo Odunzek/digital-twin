@@ -1,0 +1,8 @@
+frontend/
+infra/
+backend/
+.next/
+node_modules/
+extracted_images_p01/
+extracted_images_p02/
+week2/

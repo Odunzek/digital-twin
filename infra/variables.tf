@@ -15,7 +15,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Short name used as a prefix for all resource names (e.g., 'twin'). Keep it short and lowercase."
   type        = string
-  default     = "twin"
+  default     = "essay-coach"
 }
 
 variable "environment" {

@@ -65,9 +65,9 @@ resource "aws_apigatewayv2_integration" "twin_lambda" {
 # When the browser sends POST /chat, API Gateway routes it to the Lambda integration.
 # The "target" links this route to the integration defined above.
 # "integrations/" prefix is required by the API Gateway resource syntax.
-resource "aws_apigatewayv2_route" "chat_route" {
+resource "aws_apigatewayv2_route" "api_route" {
   api_id    = aws_apigatewayv2_api.twin.id
-  route_key = "POST /chat"
+  route_key = "POST /api"
   target    = "integrations/${aws_apigatewayv2_integration.twin_lambda.id}"
 }
 

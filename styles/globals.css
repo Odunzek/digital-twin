@@ -1,0 +1,22 @@
+@import 'tailwindcss';
+@source '../pages/**/*.{ts,tsx}';
+@source '../api/**/*.{ts,tsx}';
+
+.markdown h2 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.markdown p  { margin-bottom: 0.75rem; line-height: 1.65; }
+.markdown ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+.markdown li { margin-bottom: 0.25rem; line-height: 1.6; }
+.markdown strong { font-weight: 600; color: #111827; }
+.markdown blockquote {
+  border-left: 3px solid #6366f1;
+  padding-left: 0.875rem;
+  color: #4b5563;
+  margin: 0.75rem 0;
+  font-style: italic;
+}
