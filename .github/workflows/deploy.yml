@@ -56,7 +56,7 @@ jobs:
         env:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           DEFAULT_AWS_REGION: ${{ secrets.DEFAULT_AWS_REGION }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dWx0aW1hdGUtcmFiYml0LTk2LmNsZXJrLmFjY291bnRzLmRldiQ
         run: |
           chmod +x scripts/deploy.sh
           ./scripts/deploy.sh ${{ github.event.inputs.environment || 'dev' }}
